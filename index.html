@@ -143,10 +143,12 @@
         flex-direction: column;
         gap: 0.75rem;
       }
-      input[type="text"], input[type="url"], button {
-        width: 100%;
-        max-width: none; /* Allow inputs and buttons to take full width */
-        min-width: unset;
+      input[type="text"],
+      input[type="url"],
+      button {
+        width: 100%; /* Make inputs and buttons take full width */
+        max-width: none; /* Override any max-width for smaller screens */
+        min-width: unset; /* Override any min-width for smaller screens */
       }
       .result {
         padding: 1.5rem;
