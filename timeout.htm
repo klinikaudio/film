@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Time Out Film Review Finder</title>
+  <style>
+    :root {
+      --bg-color: #1a1a2e;
+      --text-color: #e0e0e0;
+      --primary-color: #0072ce;
+      --primary-hover-color: #005fa3;
+      --card-bg-color: #2e2e4a;
+      --border-color: #4a4a6e;
+      --error-color: #ff6b6b;
+      --placeholder-color: #a0a0b0;
+      --shadow-color: rgba(0, 0, 0, 0.3);
+    }
+
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      box-sizing: border-box; /* Ensure padding doesn't cause overflow */
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: var(--text-color);
+      font-size: 2.5rem;
+      font-weight: 600;
+    }
+    .search-box, .url-box {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+      width: 100%;
+      max-width: 800px; /* Limit width of input sections */
+    }
+    input[type="text"], input[type="url"] {
+      flex-grow: 1; /* Allow inputs to grow */
+      padding: 0.75rem 1rem;
+      font-size: 1.1rem;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background-color: var(--card-bg-color);
+      color: var(--text-color);
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      min-width: 250px; /* Ensure inputs don't get too small */
+    }
+    input[type="text"]::placeholder, input[type="url"]::placeholder {
+      color: var(--placeholder-color);
+    }
+    input[type="text"]:focus, input[type="url"]:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(0, 114, 206, 0.3);
+    }
+    button {
+      padding: 0.75rem 1.5rem;
+      font-size: 1.1rem;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.1s ease;
+      min-width: 100px; /* Ensure buttons have a minimum width */
+    }
+    button:hover {
+      background: var(--primary-hover-color);
+      transform: translateY(-1px);
+    }
+    button:active {
+      transform: translateY(0);
+    }
+    .result {
+      background: var(--card-bg-color);
+      border-radius: 12px;
+      padding: 2rem;
+      max-width: 800px;
+      margin: 1rem auto;
+      box-shadow: 0 4px 15px var(--shadow-color);
+      width: 100%; /* Make result section responsive */
+      box-sizing: border-box;
+    }
+    .result h2 {
+      color: var(--primary-color);
+      margin-top: 0;
+      margin-bottom: 1rem;
+      font-size: 1.8rem;
+    }
+    .result p {
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+    .url {
+      font-size: 0.9rem;
+      color: var(--placeholder-color);
+      margin-top: 1rem;
+      word-break: break-all; /* Prevent long URLs from overflowing */
+    }
+    .url a {
+      color: var(--primary-color);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+    .url a:hover {
+      color: var(--primary-hover-color);
+      text-decoration: underline;
+    }
+    .error {
+      color: var(--error-color);
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+    .loading {
+      text-align: center;
+      font-style: italic;
+      margin-top: 1rem;
+      color: var(--placeholder-color);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+      h1 {
+        font-size: 2rem;
+      }
+      .search-box, .url-box {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+      input[type="text"], input[type="url"], button {
+        width: 100%;
+        max-width: none; /* Allow inputs and buttons to take full width */
+        min-width: unset;
+      }
+      .result {
+        padding: 1.5rem;
+      }
+      .result h2 {
+        font-size: 1.5rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 0.75rem;
+      }
+      h1 {
+        font-size: 1.75rem;
+        margin-bottom: 1rem;
+      }
+      input[type="text"], input[type="url"], button {
+        font-size: 1rem;
+        padding: 0.6rem 1rem;
+        border-radius: 6px;
+      }
+      .result {
+        padding: 1rem;
+      }
+      .result h2 {
+        font-size: 1.3rem;
+      }
+      .result p {
+        font-size: 0.95rem;
+      }
+      .url {
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<h1>Time Out Film Review Finder</h1>
+
+<div class="search-box">
+  <input type="text" id="filmInput" placeholder="Enter film name (e.g. The Stepfather)">
+  <button id="searchBtn">Search</button>
+</div>
+
+<div class="url-box">
+  <input type="url" id="urlInput" placeholder="Or edit the Time Out URL directly">
+  <button id="reloadBtn">Reload</button>
+</div>
+
+<div id="status" class="loading"></div>
+
+<div class="result" id="result" style="display: none;">
+  <h2 id="filmTitle"></h2>
+  <p id="reviewText"></p>
+  <div class="url">
+    Source: <a id="sourceLink" href="#" target="_blank"></a>
+  </div>
+</div>
+
+<div id="error" class="error"></div>
+
+<script>
+const proxy = "https://api.allorigins.win/raw?url=";
+
+function slugify(filmName) {
+  return filmName.trim().toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
+// Attempt fetch with optional -1 suffix retry
+async function tryFetch(url) {
+  try {
+    const response = await fetch(proxy + encodeURIComponent(url));
+    if (!response.ok) throw new Error("Page not found");
+    return await response.text();
+  } catch (error) {
+    if (!url.endsWith("-1")) {
+      console.warn(`Attempting retry for ${url} with -1 suffix due to:`, error.message);
+      return await tryFetch(url + "-1");
+    }
+    throw new Error("Page not found after retrying with -1 suffix");
+  }
+}
+
+// Extract review from main or fallback annotation section
+function extractReview(html) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+
+  // 1. Try main review section
+  let reviewSection = doc.querySelector('section[data-section-name="review"]');
+  if (reviewSection) {
+    const paragraphs = reviewSection.querySelectorAll("p");
+    if (paragraphs.length) return Array.from(paragraphs).map(p => p.textContent.trim()).join("\n\n");
+  }
+
+  // 2. Fallback: annotation div using stable attributes
+  const altSection = doc.querySelector('div#content[data-component="annotation"][data-testid="annotation_testID"]');
+  if (altSection) {
+    const paragraphs = altSection.querySelectorAll("p");
+    if (paragraphs.length) {
+      return Array.from(paragraphs).map(p => p.textContent.trim()).join("\n\n");
+    } else {
+      // If no paragraphs, take the entire text content of the div
+      return altSection.textContent.trim();
+    }
+  }
+
+  throw new Error("No review section found");
+}
+
+async function fetchReview(url, filmName = "") {
+  document.getElementById("error").textContent = "";
+  document.getElementById("status").textContent = "Loading...";
+  document.getElementById("result").style.display = "none";
+
+  try {
+    const html = await tryFetch(url);
+    const reviewText = extractReview(html);
+    document.getElementById("filmTitle").textContent = filmName || "Review";
+    document.getElementById("reviewText").textContent = reviewText;
+    const link = document.getElementById("sourceLink");
+    link.href = url;
+    link.textContent = url;
+    document.getElementById("urlInput").value = url;
+    document.getElementById("result").style.display = "block";
+    document.getElementById("status").textContent = "";
+  } catch (err) {
+    document.getElementById("error").textContent = "Could not load review: " + err.message;
+    document.getElementById("status").textContent = "";
+  }
+}
+
+document.getElementById("searchBtn").addEventListener("click", () => {
+  const film = document.getElementById("filmInput").value.trim();
+  if (!film) {
+    document.getElementById("error").textContent = "Please enter a film name.";
+    return;
+  }
+  const guessedUrl = "https://www.timeout.com/movies/" + slugify(film);
+  document.getElementById("urlInput").value = guessedUrl;
+  fetchReview(guessedUrl, film);
+});
+
+document.getElementById("reloadBtn").addEventListener("click", () => {
+  const url = document.getElementById("urlInput").value.trim();
+  if (!url.startsWith("http")) {
+    document.getElementById("error").textContent = "Please enter a valid URL.";
+    return;
+  }
+  fetchReview(url);
+});
+
+document.getElementById("filmInput").addEventListener("keypress", e => {
+  if (e.key === "Enter") document.getElementById("searchBtn").click();
+});
+document.getElementById("urlInput").addEventListener("keypress", e => {
+  if (e.key === "Enter") document.getElementById("reloadBtn").click();
+});
+</script>
+</body>
+</html>
